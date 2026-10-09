@@ -1,0 +1,39 @@
+[project]
+name = "ttcoach"
+version = "0.1.0"
+description = "Table tennis AI coach: local video analysis backend"
+readme = "README.md"
+authors = [
+    { name = "Dmytro Maksymchuk", email = "d.maksymchuk@student.tudelft.nl" }
+]
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fastapi>=0.142.2",
+    "httpx>=0.28.1",
+    "numpy>=2.5.3",
+    "pydantic>=2.13.5",
+    "pydantic-settings>=2.15.0",
+    "python-multipart>=0.0.32",
+    "pyyaml>=6.0.3",
+    "scipy>=1.18.1",
+    "tomli-w>=1.2.0",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[project.scripts]
+ttcoach-api = "ttcoach.api.app:main"
+ttcoach-e2e = "ttcoach.tools.e2e:main"
+
+[build-system]
+requires = ["uv_build>=0.12.19,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["sports2d: needs the Sports2D tool env (check_available)"]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pytest>=9.1.1",
+]

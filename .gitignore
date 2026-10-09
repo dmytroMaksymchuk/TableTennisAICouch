@@ -218,3 +218,17 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+
+.omc
+
+# Project
+data/
+node_modules/
+frontend/dist/
+*.mkv
+*.mp4
+*.avi
+*.mov
+!backend/tests/fixtures/**
+backend/ttcoach.local.toml

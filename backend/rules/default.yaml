@@ -1,0 +1,71 @@
+schema_version: 1
+ruleset_id: default
+ruleset_version: "2026.10.0"     # bump on any edit; stamped into strokes.json / report.json / Job
+description: "Placeholder defaults for v1 pipeline validation. NOT coaching-validated."
+# All numbers below are PLACEHOLDER DEFAULTS - not coaching-validated; tune later.
+
+segmentation:
+  # Any registered segmenter (`uv run --project backend ttcoach-seg list`); params are validated
+  # against that segmenter's params model, missing keys take its defaults.
+  method: wrist_peaks
+  params:
+    min_peak_speed: 4.0          # torso_len/s (DEFAULT)
+    min_peak_prominence: 2.0     # torso_len/s (DEFAULT)
+    min_stroke_gap_s: 0.35       # (DEFAULT)
+    max_backswing_s: 0.8         # (DEFAULT)
+    max_follow_through_s: 0.6    # (DEFAULT)
+  contact_half_window_s: 0.03    # contact phase = contact +- this, >= 1 frame
+
+classification:
+  fh_lateral_offset_min: 0.0     # shoulder widths (DEFAULT)
+  min_shoulder_width_ratio: 0.35 # below -> side-on fallback (DEFAULT)
+  side_fallback_bh_elbow_max: 100.0  # deg (DEFAULT)
+
+view:
+  side_max_ratio: 0.35           # (DEFAULT)
+  front_min_ratio: 0.60          # (DEFAULT)
+  min_valid_frame_ratio: 0.5
+
+rules:
+  - id: fh.contact.elbow_extension
+    applies_to: [FH]
+    phase: contact
+    metric: elbow_angle_at_contact
+    op: between
+    min: 90.0                    # DEFAULT
+    max: 150.0                   # DEFAULT
+    severity: warning
+    message: "Elbow angle at contact is {value:.0f}°; aim for {min:.0f}–{max:.0f}° (slight bend)."
+  - id: bh.contact.elbow_extension
+    applies_to: [BH]
+    phase: contact
+    metric: elbow_angle_at_contact
+    op: between
+    min: 80.0                    # DEFAULT
+    max: 140.0                   # DEFAULT
+    severity: warning
+    message: "Backhand elbow at contact is {value:.0f}°; aim for {min:.0f}–{max:.0f}°."
+  - id: all.legs.knee_bend
+    applies_to: [FH, BH]
+    phase: backswing
+    metric: knee_angle_min_dom
+    op: lte
+    max: 160.0                   # DEFAULT
+    severity: info
+    message: "Knees nearly straight (min {value:.0f}°). Bend to ≤{max:.0f}° to load the legs."
+  - id: all.base.foot_stability
+    applies_to: [FH, BH]
+    metric: foot_displacement_max
+    op: lte
+    max: 0.35                    # DEFAULT, torso lengths
+    severity: warning
+    message: "Feet moved {value:.2f} torso lengths during the stroke; keep a stable base (≤{max:.2f})."
+  - id: all.timing.follow_through
+    applies_to: [FH, BH]
+    phase: follow_through
+    metric: backswing_to_follow_ratio
+    op: between
+    min: 0.5                     # DEFAULT
+    max: 2.0                     # DEFAULT
+    severity: info
+    message: "Backswing/follow-through ratio {value:.2f} is outside {min:.1f}–{max:.1f}; check swing rhythm."
